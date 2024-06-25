@@ -65,13 +65,6 @@ $ dfx start --background --clean
 
 ## API Functions
 
-### Bet Endpoints
-
-1. `POST /bets`: Create a new bet.
-2. `GET /bets/:id`: Get details of a specific bet by ID.
-3. `PUT /bets/:id/status`: Update the status of a specific bet by ID.
-4. `DELETE /bets/:id`: Delete a specific bet by ID.
-
 ### Handling Users
 
 1. dfx canister call tokenized_sports_betting add_user '(record{username="John";balance=10;})'
