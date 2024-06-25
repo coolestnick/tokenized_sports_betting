@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "canisters": {
+    "tokenized_sports_betting": {
+      "type": "rust",
+      "package": "tokenized_sports_betting",
+      "candid": "src/tokenized_sports_betting/tokenized_sports_betting.did"
+    }
+  },
+  "output_env_file": ".env"
+}

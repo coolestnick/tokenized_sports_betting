@@ -1,0 +1,60 @@
+type Bet = record {
+  id : nat64;
+  status : BetStatus;
+  updated_at : opt nat64;
+  odds : float64;
+  created_at : nat64;
+  user_id : nat64;
+  event_id : nat64;
+  amount : nat64;
+};
+type BetPayload = record {
+  odds : float64;
+  user_id : nat64;
+  event_id : nat64;
+  amount : nat64;
+};
+type BetStatus = variant { Won; Lost; Cancelled; Pending };
+type Error = variant {
+  InvalidInput : record { msg : text };
+  NotFound : record { msg : text };
+  Unauthorized : record { msg : text };
+};
+type Event = record {
+  id : nat64;
+  status : EventStatus;
+  participants : vec text;
+  name : text;
+  odds : vec float64;
+};
+type EventPayload = record {
+  status : EventStatus;
+  participants : vec text;
+  name : text;
+  odds : vec float64;
+};
+type EventStatus = variant { Ongoing; Cancelled; Completed; Upcoming };
+type Result = variant { Ok : Bet; Err : Error };
+type Result_1 = variant { Ok : Event; Err : Error };
+type Result_2 = variant { Ok : User; Err : Error };
+type User = record {
+  id : nat64;
+  username : text;
+  balance : nat64;
+  bet_history : vec nat64;
+};
+type UserPayload = record { username : text; balance : nat64 };
+service : {
+  add_bet : (BetPayload) -> (Result);
+  add_event : (EventPayload) -> (Result_1);
+  add_user : (UserPayload) -> (Result_2);
+  delete_bet : (nat64) -> (Result);
+  delete_event : (nat64) -> (Result_1);
+  delete_user : (nat64) -> (Result_2);
+  get_bet : (nat64) -> (Result) query;
+  get_event : (nat64) -> (Result_1) query;
+  get_user : (nat64) -> (Result_2) query;
+  update_bet_status : (nat64, BetStatus) -> (Result);
+  update_event : (nat64, EventPayload) -> (Result_1);
+  update_user : (nat64, UserPayload) -> (Result_2);
+}
