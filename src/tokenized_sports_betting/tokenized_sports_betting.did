@@ -37,6 +37,7 @@ type EventStatus = variant { Ongoing; Cancelled; Completed; Upcoming };
 type Result = variant { Ok : Bet; Err : Error };
 type Result_1 = variant { Ok : Event; Err : Error };
 type Result_2 = variant { Ok : User; Err : Error };
+type Result_3 = variant { Ok : vec Bet; Err : Error };
 type User = record {
   id : nat64;
   username : text;
@@ -51,10 +52,14 @@ service : {
   delete_bet : (nat64) -> (Result);
   delete_event : (nat64) -> (Result_1);
   delete_user : (nat64) -> (Result_2);
+  deposit_balance : (nat64, nat64) -> (Result_2);
   get_bet : (nat64) -> (Result) query;
   get_event : (nat64) -> (Result_1) query;
   get_user : (nat64) -> (Result_2) query;
+  get_user_bets : (nat64) -> (Result_3) query;
   update_bet_status : (nat64, BetStatus) -> (Result);
   update_event : (nat64, EventPayload) -> (Result_1);
+  update_event_status : (nat64, EventStatus) -> (Result_1);
   update_user : (nat64, UserPayload) -> (Result_2);
+  withdraw_balance : (nat64, nat64) -> (Result_2);
 }

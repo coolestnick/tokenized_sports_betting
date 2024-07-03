@@ -377,6 +377,81 @@ fn delete_event(id: u64) -> Result<Event, Error> {
     }
 }
 
+// New Functions
+
+// Function to deposit balance for a user
+#[ic_cdk::update]
+fn deposit_balance(user_id: u64, amount: u64) -> Result<User, Error> {
+    if amount == 0 {
+        return Err(Error::InvalidInput {
+            msg: "Deposit amount must be greater than zero".to_string(),
+        });
+    }
+    USER_STORAGE.with(|storage| {
+        let mut storage = storage.borrow_mut();
+        let mut user = storage.get(&user_id).ok_or_else(|| Error::NotFound {
+            msg: "User not found".to_string(),
+        })?;
+        user.balance += amount;
+        storage.insert(user.id, user.clone());
+        Ok(user)
+    })
+}
+
+// Function to withdraw balance for a user
+#[ic_cdk::update]
+fn withdraw_balance(user_id: u64, amount: u64) -> Result<User, Error> {
+    if amount == 0 {
+        return Err(Error::InvalidInput {
+            msg: "Withdrawal amount must be greater than zero".to_string(),
+        });
+    }
+    USER_STORAGE.with(|storage| {
+        let mut storage = storage.borrow_mut();
+        let mut user = storage.get(&user_id).ok_or_else(|| Error::NotFound {
+            msg: "User not found".to_string(),
+        })?;
+        if user.balance < amount {
+            return Err(Error::InvalidInput {
+                msg: "Insufficient balance".to_string(),
+            });
+        }
+        user.balance -= amount;
+        storage.insert(user.id, user.clone());
+        Ok(user)
+    })
+}
+
+// Function to update event status
+#[ic_cdk::update]
+fn update_event_status(event_id: u64, status: EventStatus) -> Result<Event, Error> {
+    EVENT_STORAGE.with(|storage| {
+        let mut storage = storage.borrow_mut();
+        let mut event = storage.get(&event_id).ok_or_else(|| Error::NotFound {
+            msg: "Event not found".to_string(),
+        })?;
+        event.status = status;
+        storage.insert(event.id, event.clone());
+        Ok(event)
+    })
+}
+
+// Function to get all bets by a user
+#[ic_cdk::query]
+fn get_user_bets(user_id: u64) -> Result<Vec<Bet>, Error> {
+    USER_STORAGE.with(|storage| {
+        let user = storage.borrow().get(&user_id).ok_or_else(|| Error::NotFound {
+            msg: "User not found".to_string(),
+        })?;
+        let bets = BET_STORAGE.with(|bet_storage| {
+            user.bet_history.iter()
+                .filter_map(|bet_id| bet_storage.borrow().get(bet_id))
+                .collect()
+        });
+        Ok(bets)
+    })
+}
+
 // Helper method to insert bet
 fn do_insert_bet(bet: &Bet) {
     BET_STORAGE.with(|service| service.borrow_mut().insert(bet.id, bet.clone()));
